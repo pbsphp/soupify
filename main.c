@@ -14,10 +14,12 @@
 void print_help()
 {
     const char *help_message = \
-        "TODO\n"
-        "Write\n"
-        "help\n"
-        "text.\n";
+        "Usage: appname input_file output_file [-q] [-d diameter]\n"
+        "Blurs picture with gaussian smoothing.\n"
+        "\n"
+        "-q, --quiet \t Quiet mode.\n"
+        "-d, --diameter \t Gaussian blur diameter.\n";
+        "-h, --help \t Print this message.\n";
 
     printf(help_message);
 }
