@@ -23,4 +23,13 @@ int read_image(char *image_path, unsigned char *rgba_buffer,
                 struct ImageInfo *image_info, size_t buffer_size);
 
 
+
+/*
+    This function writes RGBA data to image.
+    Returns negative on failure.
+*/
+int write_image(char *image_path,
+                size_t width, size_t height, const unsigned char *rgba_data);
+
+
 #endif

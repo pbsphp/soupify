@@ -70,3 +70,70 @@ int read_image(char *image_path, unsigned char *rgba_buffer,
 
     return 0;
 }
+
+
+
+/*
+    This function writes RGBA data to image.
+    Returns negative on failure.
+*/
+int write_image(char *image_path,
+                size_t width, size_t height, const unsigned char *rgba_data)
+{
+    /* Open image */
+    MagickWandGenesis();
+    MagickWand *image_wand = NewMagickWand();
+
+    PixelWand *bg = NewPixelWand();
+    MagickBooleanType status = MagickNewImage(image_wand, width, height, bg);
+
+    if (status == MagickFalse) {
+        return RI_ERR_OUT_OF_MEMORY;
+    }
+
+    /* Write pixel by pixel */
+    PixelIterator *iterator = NewPixelIterator(image_wand);
+
+    if (iterator == NULL) {
+        return RI_ERR_OUT_OF_MEMORY;
+    }
+
+    /* Generate image from RGB */
+    for (int y = 0; y < height; ++y) {
+        PixelWand **pixels = PixelGetNextIteratorRow(iterator, &width);
+
+        for (int x = 0; x < width; ++x) {
+            /* Write (x, y) pixel */
+            long long index = y * width + x;
+
+            double red = rgba_data[4 * index + 0] / 255.0;
+            double green = rgba_data[4 * index + 1] / 255.0;
+            double blue = rgba_data[4 * index + 2] / 255.0;
+            double opacity = rgba_data[4 * index + 3] / 255.0;
+
+            PixelSetRed(pixels[x], red);
+            PixelSetGreen(pixels[x], green);
+            PixelSetBlue(pixels[x], blue);
+            PixelSetOpacity(pixels[x], opacity);
+        }
+
+        PixelSyncIterator(iterator);
+    }
+
+
+    /* Create file */
+    status = MagickWriteImage(image_wand, image_path);
+    if (status == MagickFalse) {
+        return RI_ERR_BADFILE;
+    }
+
+
+    /* Clear */
+    DestroyPixelIterator(iterator);
+    DestroyMagickWand(image_wand);
+    DestroyPixelWand(bg);
+    MagickWandTerminus();
+
+    return 0;
+}
+
