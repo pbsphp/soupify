@@ -1,7 +1,7 @@
 
 #include <wand/MagickWand.h>
 
-#include "read_image.h"
+#include "image_io.h"
 
 
 /*
