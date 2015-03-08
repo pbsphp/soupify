@@ -134,6 +134,11 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Out of memory!\n", origin_path);
         }
         exit(1);
+    } else if (stat == B_ERR_CUDA_ERROR) {
+        if (!quiet_mode) {
+            fprintf(stderr, "Error on GPU!\n", origin_path);
+        }
+        exit(1);
     }
 
 

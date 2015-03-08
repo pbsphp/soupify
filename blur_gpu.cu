@@ -93,6 +93,8 @@ int gaussian_blur(  const unsigned char *source_image,
                     unsigned char *result_image,
                     size_t width, size_t height, int diameter)
 {
+    cudaError errcode;
+
     /* Create gaussian matrix */
 
     float *gaussian_matrix = (float *) malloc(  diameter * diameter * \
@@ -112,22 +114,46 @@ int gaussian_blur(  const unsigned char *source_image,
     /* Apply gaussian smooth on each pixel */
 
     /* Copy gaussian matrix to device memory */
-    cudaMemcpyToSymbol( device_matrix, gaussian_matrix,
-                        diameter * diameter * sizeof(float));
+    errcode = cudaMemcpyToSymbol(   device_matrix, gaussian_matrix,
+                                    diameter * diameter * sizeof(float));
+
+    if (errcode != cudaSuccess) {
+        /* TODO: it may be something else */
+        return B_ERR_CUDA_ERROR;
+    }
+
 
     /* Result buffer (GPU) */
     unsigned char *result_dev;
-    cudaMalloc((void **) &result_dev, width * height * 4);
+    errcode = cudaMalloc((void **) &result_dev, width * height * 4);
+
+    if (errcode != cudaSuccess) {
+        return B_ERR_CUDA_ERROR;
+    }
 
 
     /* Place source image to texture memory */
     cudaChannelFormatDesc desc = cudaCreateChannelDesc<unsigned char>();
     cudaArray* source_dev;
-    cudaMallocArray(&source_dev, &desc, width * 4, height);
-    cudaMemcpyToArray(  source_dev, 0, 0, source_image,
-                        width * height * 4, cudaMemcpyHostToDevice);
+    errcode = cudaMallocArray(&source_dev, &desc, width * 4, height);
 
-    cudaBindTextureToArray(source_tex, source_dev, desc);
+    if (errcode != cudaSuccess) {
+        return B_ERR_CUDA_ERROR;
+    }
+
+
+    errcode = cudaMemcpyToArray(source_dev, 0, 0, source_image,
+                                width * height * 4, cudaMemcpyHostToDevice);
+
+    if (errcode != cudaSuccess) {
+        return B_ERR_CUDA_ERROR;
+    }
+
+    errcode = cudaBindTextureToArray(source_tex, source_dev, desc);
+
+    if (errcode != cudaSuccess) {
+        return B_ERR_CUDA_ERROR;
+    }
 
 
     /* Calculate smoothing for each pixel */
@@ -140,8 +166,12 @@ int gaussian_blur(  const unsigned char *source_image,
 
 
     /* Copy result image from GPU buffer to host memory */
-    cudaMemcpy(result_image, result_dev,
-                width * height * 4, cudaMemcpyDeviceToHost);
+    errcode = cudaMemcpy(   result_image, result_dev,
+                            width * height * 4, cudaMemcpyDeviceToHost);
+
+    if (errcode != cudaSuccess) {
+        return B_ERR_CUDA_ERROR;
+    }
 
 
     /* Cleanup */
