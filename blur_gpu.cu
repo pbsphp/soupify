@@ -89,8 +89,7 @@ extern "C" {
 /*
     Smooth source_image and puts result to result_image
 */
-int gaussian_blur(  const unsigned char *source_image,
-                    unsigned char *result_image,
+int gaussian_blur(  unsigned char *image_buffer,
                     size_t width, size_t height, int diameter)
 {
     cudaError errcode;
@@ -118,7 +117,6 @@ int gaussian_blur(  const unsigned char *source_image,
                                     diameter * diameter * sizeof(float));
 
     if (errcode != cudaSuccess) {
-        /* TODO: it may be something else */
         return B_ERR_CUDA_ERROR;
     }
 
@@ -133,6 +131,7 @@ int gaussian_blur(  const unsigned char *source_image,
 
 
     /* Place source image to texture memory */
+
     cudaChannelFormatDesc desc = cudaCreateChannelDesc<unsigned char>();
     cudaArray* source_dev;
     errcode = cudaMallocArray(&source_dev, &desc, width * 4, height);
@@ -141,8 +140,7 @@ int gaussian_blur(  const unsigned char *source_image,
         return B_ERR_CUDA_ERROR;
     }
 
-
-    errcode = cudaMemcpyToArray(source_dev, 0, 0, source_image,
+    errcode = cudaMemcpyToArray(source_dev, 0, 0, image_buffer,
                                 width * height * 4, cudaMemcpyHostToDevice);
 
     if (errcode != cudaSuccess) {
@@ -166,7 +164,7 @@ int gaussian_blur(  const unsigned char *source_image,
 
 
     /* Copy result image from GPU buffer to host memory */
-    errcode = cudaMemcpy(   result_image, result_dev,
+    errcode = cudaMemcpy(   image_buffer, result_dev,
                             width * height * 4, cudaMemcpyDeviceToHost);
 
     if (errcode != cudaSuccess) {

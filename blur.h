@@ -9,8 +9,7 @@
 /*
     Smooth source_image and puts result to result_image
 */
-int gaussian_blur(  const unsigned char *source_image,
-                    unsigned char *result_image,
+int gaussian_blur(  unsigned char *image_buffer,
                     size_t width, size_t height, int diameter);
 
 

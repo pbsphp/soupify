@@ -28,7 +28,7 @@ int read_image(char *image_path, unsigned char *rgba_buffer,
     /* Read pixel by pixel */
     PixelIterator *iterator = NewPixelIterator(image_wand);
 
-    long long bytes_read = 0;
+    size_t bytes_read = 0;
 
     height = MagickGetImageHeight(image_wand);
     for (int y = 0; y < height; ++y) {
@@ -39,7 +39,7 @@ int read_image(char *image_path, unsigned char *rgba_buffer,
 
         for (int x = 0; x < width; ++x) {
             /* Read (x, y) pixel */
-            long long index = y * width + x;
+            size_t index = y * width + x;
 
             MagickPixelPacket pixel;
             PixelGetMagickColor(pixels[x], &pixel);
@@ -104,7 +104,7 @@ int write_image(char *image_path,
 
         for (int x = 0; x < width; ++x) {
             /* Write (x, y) pixel */
-            long long index = y * width + x;
+            size_t index = y * width + x;
 
             double red = rgba_data[4 * index + 0] / 255.0;
             double green = rgba_data[4 * index + 1] / 255.0;

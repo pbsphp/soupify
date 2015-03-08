@@ -76,10 +76,13 @@ static void apply_pixel(int x, int y,
 /*
     Smooth source_image and puts result to result_image
 */
-int gaussian_blur(  const unsigned char *source_image,
-                    unsigned char *result_image,
+int gaussian_blur(  unsigned char *image_buffer,
                     size_t width, size_t height, int diameter)
 {
+    /* Allocate memory for image_buffer copy to store result */
+    unsigned char *result_buffer = (unsigned char *) \
+                                    malloc(width * height * 4);
+
     /* Create gaussian matrix */
 
     float *gaussian_matrix = (float *) malloc(  diameter * diameter * \
@@ -101,15 +104,20 @@ int gaussian_blur(  const unsigned char *source_image,
         for (int x = 0; x < width; ++x) {
 
             /* Smooth current pixel */
-            apply_pixel(x, y, source_image, result_image,
+            apply_pixel(x, y, image_buffer, result_buffer,
                         width, height,
                         gaussian_matrix, diameter, matrix_sum);
         }
     }
 
 
+    /* Copy result to image buffer */
+    memcpy(image_buffer, result_buffer, width * height * 4);
+
+
     /* Cleanup */
 
+    free(result_buffer);
     free(gaussian_matrix);
 
     return 0;

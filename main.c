@@ -8,7 +8,7 @@
 #include "blur.h"
 
 
-#define MAX_IMAGE_SIZE (2048 * 2048 * 4)
+#define MAX_IMAGE_SIZE (3000 * 3000 * 4)
 
 
 void print_help()
@@ -93,10 +93,9 @@ int main(int argc, char *argv[])
 
     /* Allocate memory for files */
 
-    unsigned char *origin_img = (unsigned char *) malloc(MAX_IMAGE_SIZE);
-    unsigned char *blurred_img = (unsigned char *) malloc(MAX_IMAGE_SIZE);
+    unsigned char *image_buffer = (unsigned char *) malloc(MAX_IMAGE_SIZE);
 
-    if (origin_img == NULL || blurred_img == NULL) {
+    if (image_buffer == NULL) {
         if (!quiet_mode) {
             fprintf(stderr, "Out of memory!\n");
         }
@@ -107,7 +106,7 @@ int main(int argc, char *argv[])
     /* Read file */
 
     struct ImageInfo img;
-    int stat = read_image(origin_path, origin_img, &img, MAX_IMAGE_SIZE);
+    int stat = read_image(origin_path, image_buffer, &img, MAX_IMAGE_SIZE);
 
     if (stat == RI_ERR_BADFILE) {
         if (!quiet_mode) {
@@ -126,8 +125,7 @@ int main(int argc, char *argv[])
 
     /* Smooth image */
 
-    stat = gaussian_blur(origin_img, blurred_img,
-                        img.width, img.height, diameter);
+    stat = gaussian_blur(image_buffer, img.width, img.height, diameter);
 
     if (stat == B_ERR_OUT_OF_MEMORY) {
         if (!quiet_mode) {
@@ -144,7 +142,7 @@ int main(int argc, char *argv[])
 
     /* Write blurred image to output file */
 
-    stat = write_image(blurred_path, img.width, img.height, blurred_img);
+    stat = write_image(blurred_path, img.width, img.height, image_buffer);
 
     if (stat == RI_ERR_BADFILE) {
         if (!quiet_mode) {
@@ -163,8 +161,7 @@ int main(int argc, char *argv[])
 
     /* Cleanup */
 
-    free(origin_img);
-    free(blurred_img);
+    free(image_buffer);
 
     return 0;
 }
