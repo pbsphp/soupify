@@ -8,18 +8,26 @@
 #define PI 3.141593
 
 
-/* If pixel with x,y exists, "returns" it. Otherwise "returns" black pixel */
+/* If pixel with x,y exists, "returns" it. Otherwise "returns" closest */
 static void get_pixel_at(int x, int y, int width, int height,
                     const unsigned char *image, int *pixel)
 {
-    if (0 <= x && x < width && 0 <= y && y < height) {
-        for (int i = 0; i < 3; ++i) {
-            pixel[i] = image[(y * width + x) * 4 + i];
-        }
-    } else {
-        for (int i = 0; i < 3; ++i) {
-            pixel[i] = 0;
-        }
+    if (x < 0) {
+        x = 0;
+    }
+    else if (x >= width) {
+        x = width - 1;
+    }
+    if (y < 0) {
+        y = 0;
+    }
+    else if (y >= width) {
+        y = height - 1;
+    }
+
+
+    for (int i = 0; i < 3; ++i) {
+        pixel[i] = image[(y * width + x) * 4 + i];
     }
 }
 
