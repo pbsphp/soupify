@@ -10,9 +10,7 @@ extern "C" {
 }
 
 #include "gaussian_matrix.h"
-
-
-#define PI 3.141593
+#include "app_limits.h"
 
 
 /* Source image texture */
@@ -20,9 +18,7 @@ texture<unsigned char, 2> source_tex;
 
 
 /* Gaussian matrix in GPU memory */
-__constant__ float device_matrix[100 * 100];
-/* TODO: check limits */
-
+__constant__ float device_matrix[MAX_GAUSSIAN_MATRIX_SIZE];
 
 
 /*

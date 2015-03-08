@@ -7,8 +7,7 @@
 #include "image_io.h"
 #include "blur.h"
 
-
-#define MAX_IMAGE_SIZE (3000 * 3000 * 4)
+#include "app_limits.h"
 
 
 void print_help()
@@ -69,6 +68,14 @@ int main(int argc, char *argv[])
 
         case 'd':
             sscanf(optarg, "%d", &diameter);
+
+            /* Test diameter */
+            if (diameter <= 0 || diameter > MAX_BLUR_DIAMETER) {
+                fprintf(stderr, "Diameter must be in 1..%d\n",
+                        MAX_BLUR_DIAMETER);
+                exit(1);
+            }
+
             break;
 
         default:
@@ -84,7 +91,8 @@ int main(int argc, char *argv[])
         origin_path = argv[optind++];
         blurred_path = argv[optind++];
     } else {
-        printf("You must specify input and output files.\n\n");
+        fprintf(stderr, "You must specify input and output files.\n");
+        printf("\n");
         print_help();
         exit(1);
     }
