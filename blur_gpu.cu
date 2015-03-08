@@ -13,6 +13,9 @@ extern "C" {
 #include "app_limits.h"
 
 
+#define THREADS_DIM 16
+
+
 /* Source image texture */
 texture<unsigned char, 2> source_tex;
 
@@ -152,8 +155,9 @@ int gaussian_blur(  unsigned char *image_buffer,
 
     /* Calculate smoothing for each pixel */
 
-    dim3 blocks(width / 16, height / 16);
-    dim3 threads(16, 16);
+    dim3 blocks((width + THREADS_DIM) / THREADS_DIM,
+                (height + THREADS_DIM) / THREADS_DIM);
+    dim3 threads(THREADS_DIM, THREADS_DIM);
 
     apply_pixels<<<blocks, threads>>>(  result_dev, width, height,
                                         diameter, matrix_sum);
