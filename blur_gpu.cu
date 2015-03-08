@@ -9,6 +9,8 @@ extern "C" {
 # include "blur.h"
 }
 
+#include "gaussian_matrix.h"
+
 
 #define PI 3.141593
 
@@ -22,15 +24,10 @@ __constant__ float device_matrix[100 * 100];
 /* TODO: check limits */
 
 
-/* Gaussian function */
-static inline float G(int x, int y, float sigma)
-{
-    return (1 / (2 * PI * sigma * sigma)) * \
-            exp(-(x * x + y * y) / (2 * sigma * sigma));
-}
 
-
-/* If pixel with x,y exists, "returns" it. Otherwise "returns" black pixel */
+/*
+    If pixel with x,y exists, "returns" it. Otherwise "returns" black pixel
+*/
 __device__ void get_pixel_at(int x, int y, int *pixel)
 {
     for (int i = 0; i < 3; ++i) {
@@ -96,8 +93,6 @@ int gaussian_blur(  const unsigned char *source_image,
                     unsigned char *result_image,
                     size_t width, size_t height, int diameter)
 {
-    float sigma = diameter / 6.0;
-
     /* Create gaussian matrix */
 
     float *gaussian_matrix = (float *) malloc(  diameter * diameter * \
@@ -110,34 +105,8 @@ int gaussian_blur(  const unsigned char *source_image,
 
     /* Calculate gaussian matrix */
 
-    int radius = (diameter + 1) / 2;
-
-    for (int y = 0; y < radius; ++y) {
-        for (int x = 0; x < radius; ++x) {
-            int x_dist = radius - x - 1;
-            int y_dist = radius - y - 1;
-
-            float g = G(x_dist, y_dist, sigma);
-
-            int y2 = diameter - y - 1;
-            int x2 = diameter - x - 1;
-
-            gaussian_matrix[y * diameter + x] = g;
-            gaussian_matrix[y2 * diameter + x] = g;
-            gaussian_matrix[y * diameter + x2] = g;
-            gaussian_matrix[y2 * diameter + x2] = g;
-        }
-    }
-
-
-    /* Calculate gaussian matrix sum */
-
-    float matrix_sum = 0;
-    for (int y = 0; y < diameter; ++y) {
-        for (int x = 0; x < diameter; ++x) {
-            matrix_sum += gaussian_matrix[y * diameter + x];
-        }
-    }
+    float matrix_sum;
+    calculate_gaussian_matrix(gaussian_matrix, diameter, &matrix_sum);
 
 
     /* Apply gaussian smooth on each pixel */

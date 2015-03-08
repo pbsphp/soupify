@@ -10,7 +10,7 @@ CU_LDFLAGS=-lcuda -lcudart -lstdc++
 
 SOURCES=image_io.c main.c
 
-CPU_SOURCES=blur.c
+CPU_SOURCES=blur_cpu.c
 GPU_SOURCES=blur_gpu.cu
 
 OBJECTS=$(SOURCES:.c=.o)
