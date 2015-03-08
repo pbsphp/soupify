@@ -17,7 +17,7 @@ void print_help()
         "Blurs picture with gaussian smoothing.\n"
         "\n"
         "-q, --quiet \t Quiet mode.\n"
-        "-d, --diameter \t Gaussian blur diameter.\n";
+        "-d, --diameter \t Gaussian blur diameter.\n"
         "-h, --help \t Print this message.\n";
 
     printf(help_message);
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
     if (stat == RI_ERR_OUT_OF_MEMORY) {
         if (!quiet_mode) {
-            fprintf(stderr, "Out of memory!\n", origin_path);
+            fprintf(stderr, "Out of memory!\n");
         }
         exit(1);
     }
@@ -137,12 +137,12 @@ int main(int argc, char *argv[])
 
     if (stat == B_ERR_OUT_OF_MEMORY) {
         if (!quiet_mode) {
-            fprintf(stderr, "Out of memory!\n", origin_path);
+            fprintf(stderr, "Out of memory!\n");
         }
         exit(1);
     } else if (stat == B_ERR_CUDA_ERROR) {
         if (!quiet_mode) {
-            fprintf(stderr, "Error on GPU!\n", origin_path);
+            fprintf(stderr, "Error on GPU!\n");
         }
         exit(1);
     }
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 
     if (stat == RI_ERR_OUT_OF_MEMORY) {
         if (!quiet_mode) {
-            fprintf(stderr, "Out of memory!\n", origin_path);
+            fprintf(stderr, "Out of memory!\n");
         }
         exit(1);
     }

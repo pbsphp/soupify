@@ -3,7 +3,7 @@ CC=gcc
 NVCC=nvcc
 
 CFLAGS=-std=c99 -pedantic -Wall -O2 -march=native
-CUFLAGS=
+CUFLAGS=-gencode arch=compute_20,code=sm_20
 
 LDFLAGS=-lm
 CU_LDFLAGS=-lcuda -lcudart -lstdc++
